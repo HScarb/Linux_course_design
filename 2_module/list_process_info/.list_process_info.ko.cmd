@@ -1,0 +1,1 @@
+cmd_/root/cpp/module/list_process_info/list_process_info.ko := ld -r -m elf_x86_64 -T /usr/src/linux-source-3.13.0/scripts/module-common.lds --build-id  -o /root/cpp/module/list_process_info/list_process_info.ko /root/cpp/module/list_process_info/list_process_info.o /root/cpp/module/list_process_info/list_process_info.mod.o

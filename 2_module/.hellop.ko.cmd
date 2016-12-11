@@ -1,0 +1,1 @@
+cmd_/root/cpp/module/hellop.ko := ld -r -m elf_x86_64 -T /usr/src/linux-source-3.13.0/scripts/module-common.lds --build-id  -o /root/cpp/module/hellop.ko /root/cpp/module/hellop.o /root/cpp/module/hellop.mod.o
