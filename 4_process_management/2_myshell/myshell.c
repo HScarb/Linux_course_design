@@ -42,6 +42,54 @@ void myFork(int cmdIndex)
 		printf("Fork Error\n");
 		exit(0);
 	}
+	else if (pid == 0)
+	{
+		int execl_status = -1;
+		printf("Child is running.\n");
+
+		switch(cmdIndex)
+		{
+		case CMD_1:
+			execl_status = execl("./cmd1", "cmd1", NULL);
+			break;
+		case CMD_2:
+			execl_status = execl("./cmd2", "cmd2", NULL);
+			break;
+		case CMD_3:
+			execl_status = execl("./cmd3", "cmd3", NULL);
+			break;
+		default:
+			printf("Invalid command.\n");
+			break;
+		}
+
+		if (execl_status < 0)
+		{
+			printf("Fork error.\n");
+			exit(0);
+		}
+
+		printf("Child is OK!\n");
+		exit(0);
+	}
+	else
+		return;
+}
+
+void runCMD(int cmdIndex)
+{
+	switch(cmdIndex)
+	{
+	case INVALID_COMMAND:
+		printf("Command not found.\n");
+		break;
+	case EXIT:
+		exit(0);
+		break;
+	default:
+		myFork(cmdIndex);
+		break;
+	}
 }
 
 int main()
