@@ -23,7 +23,7 @@ char * cmdStr [CMD_COLLECTION_LEN] = {"exit", "cmd1", "cmd2", "cmd3"};
 int getCmdIndex(char *cmd)
 {
 	int i;
-	for (i = 0; i < CMD_COLLCETION_LEN; i++)
+	for (i = 0; i < CMD_COLLECTION_LEN; i++)
 	{
 		if(strcmp(cmd, cmdStr[i]) == 0)
 		{
