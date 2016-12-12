@@ -18,8 +18,11 @@
 // bool
 #define TRUE 1
 
-char * cmdStr [CMD_COLLECTION_LEN] = {"exit", "cmd1", "cmd2", "cmd3"};
+char * cmdStr [CMD_COLLECTION_LEN] = {"exit", "cmd1", "cmd2", "cmd3"};		// 命令字符串
 
+/**
+*	把输入进来的命令字符串转换成命令号	
+*/
 int getCmdIndex(char *cmd)
 {
 	int i;
@@ -27,25 +30,25 @@ int getCmdIndex(char *cmd)
 	{
 		if(strcmp(cmd, cmdStr[i]) == 0)
 		{
-			return i;
+			return i;		// 返回:命令号
 		}
 	}
-	return -1;
+	return INVALID_COMMAND;	// 返回:无效命令
 }
 
 void myFork(int cmdIndex)
 {
 	pid_t pid;
-	
-	if((pid = fork()) < 0)
+	pid = fork();		// 创建子进程
+	if (pid < 0)		// 如果创建出错
 	{
-		printf("Fork Error\n");
-		exit(0);
+		printf("*Fork Error\n");
+		exit(1);
 	}
-	else if (pid == 0)
+	else if (pid == 0)	// 成功创建子进程
 	{
 		int execl_status = -1;
-		printf("Child is running.\n");
+		printf("-Child is running.\n");
 
 		switch(cmdIndex)
 		{
@@ -59,29 +62,32 @@ void myFork(int cmdIndex)
 			execl_status = execl("./cmd3", "cmd3", NULL);
 			break;
 		default:
-			printf("Invalid command.\n");
+			printf("*Invalid command.\n");
 			break;
 		}
 
 		if (execl_status < 0)
 		{
-			printf("Fork error.\n");
-			exit(0);
+			printf("*Fork error.\n");
+			exit(1);
 		}
 
-		printf("Child is OK!\n");
-		exit(0);
+		printf("-Child is OK!\n");
+		exit(1);
 	}
 	else
 		return;
 }
 
+/**
+*	根据命令号分配子进程执行命令
+*/
 void runCMD(int cmdIndex)
 {
 	switch(cmdIndex)
 	{
 	case INVALID_COMMAND:
-		printf("Command not found.\n");
+		printf("*Command not found.\n");
 		break;
 	case EXIT:
 		exit(0);
@@ -100,12 +106,12 @@ int main()
 	int cmdIndex;
 	while(1)
 	{
-		printf("\n Please Input your command:\n");
+		printf("\n*Please Input your command:\n");
 		scanf("%s", cmdStr);
 		cmdIndex = getCmdIndex(cmdStr);
 		runCMD(cmdIndex);
 
 		wait(0);
-		printf("Wating for next command...\n");
+		printf("*Wating for next command...\n");
 	}
 }
