@@ -48,7 +48,7 @@ void myFork(int cmdIndex)
 	else if (pid == 0)	// 成功创建子进程
 	{
 		int execl_status = -1;
-		printf("-Child is running.\n");
+		//printf("-Child is running.\n");
 
 		switch(cmdIndex)
 		{
