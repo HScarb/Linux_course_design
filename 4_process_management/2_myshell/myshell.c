@@ -73,7 +73,7 @@ void myFork(int cmdIndex)
 		}
 
 		printf("-Child is OK!\n");
-		exit(1);
+		exit(0);
 	}
 	else
 		return;

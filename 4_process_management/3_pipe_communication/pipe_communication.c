@@ -14,14 +14,20 @@
 void initStr(char * str, int len)
 {
     int i;
-    char string[MAXSIZE];
+    char string[MAXSIZE] = "";
 
     for (i = 0; i < len; i++)
     {
         strcat(string, "*");
     }
+    /*
+    printf("string = %s\n", string);
+
     strcpy(str, "\0");
+    printf("str = %s\n", str);
     strcat(str, string);
+    printf("str now = %s\n", str);
+    */
 }
 
 void pipeWrite(int fd[2], int len)
@@ -57,28 +63,28 @@ void pipeRead(int fd[2], int len)
     printf("Read process: Read %d characters.\n", nRead);
 }
 
-void WriteProcess(int  fd[2])
+void writeProcess(int  fd[2])
 {
 
-	PipeWrite(fd,WRITE_LEN);
+	pipeWrite(fd,WRITE_LEN);
 
 	printf("Write process: Sleep - 10 Seconds ...\n");
 	sleep(10);
-	printf("Write process: Wake up  then Why not rewrite 70 characters  ? \n");
+	printf("Write process: Wake up, then Why not rewrite 70 characters ? \n");
 
-	PipeWrite(fd,WRITE_LEN);
-	printf("Write process : Done\n");
+	pipeWrite(fd,WRITE_LEN);
+	printf("Write process: Done\n");
 }
 
 void readProcess(int fd[2])
 {
-    printf("Read process: Time 1.\n");
+    printf("Read process: Time 1.====================\n");
     pipeRead(fd, READ_LEN);
 
-    printf("Read process: Time 2.\n");
+    printf("Read process: Time 2.====================\n");
     pipeRead(fd, READ_LEN);
 
-    printf("Read process: Time 3.\n");\
+    printf("Read process: Time 3.====================\n");\
     pipeRead(fd, READ_LEN);
 }
 
@@ -106,7 +112,7 @@ int main()
     else                    // father interprocess
     {
         // create a new child interprocess: read 50
-        if((pid = for()) < 0)
+        if((pid = fork()) < 0)
         {
             fprintf(stderr, "Fork error: %s\n", strerror(errno));
             exit(EXIT_FAILURE);
@@ -119,7 +125,7 @@ int main()
         {
             wait(0);
             wait(0);
-            printf("End of program.\m");
+            printf("End of program.\n");
             return 0;
         }
     }
