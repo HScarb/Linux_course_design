@@ -47,5 +47,103 @@ void init()
 {
     // init semaphore
     sem_init(&full, 0, 0);
-    
+    sem_init(&empty,0 ,1);
+    sem_init(&mutex, 0, 1);
+
+    key = KEY_NUM;
+
+    // create message queue
+    if((msgid = msgget(key, PERM|IPC_CREAT)) == -1)
+    {
+        fprintf(stderr, "Create Message Queue Error %s \n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+}
+
+void * readProcess(void *arg)
+{
+    msgbuf msg;
+    // init msg
+    msg.mtype = 1;
+    while(1)
+    {
+        sem_wait(&full);
+        sem_wait(&mutex);
+
+        // receive message from message queue
+        msgrcv(msgid, &msg, sizeof(msgbuf), 1, 0);
+
+        // detect for end
+        if(strcmp(msg.mtext, "end") == 0)
+        {
+            msg.mtype = 2;
+            strncpy(msg.mtext, "over", BUFFER_SIZE);
+            msgsnd(msgid, &msg, sizeof(msgbuf), 0);
+            break;
+        }
+
+        // print message
+        printf("R: [message received] %s\n\n", msg.mtext);
+
+        sem_post(&empty);
+        sem_post(&mutex);
+    }
+    exit(EXIT_SUCCESS);
+}
+
+void * writeProcess(void * arg)
+{
+    char input[50];
+    msgbuf msg;
+    msg.mtype = 1;
+
+    while(1)
+    {
+        // semaphore
+        sem_wait(&empty);
+        sem_wait(&mutex);
+
+        printf("W: Please input the message you want to send:\n");
+        scanf("%s", input);
+        
+        if(strcmp(input, "exit") == 0)
+        {
+            strncpy(msg.mtext, "end", BUFFER_SIZE);
+            msgsnd(msgid, &msg, sizeof(msgbuf), 0);
+            break;
+        }
+        strncpy(msg.mtext, input, BUFFER_SIZE);
+        msgsnd(msgid, &msg, sizeof(msgbuf), 0);
+
+        printf("W: [message sent] %s\n", msg.mtext);
+
+        sem_post(&full);
+        sem_post(&mutex);
+    }
+    // clear node
+    memset(&msg, '\0', sizeof(msgbuf));
+    // block, waiting for message with type 2
+    msgrcv(msgid, &msg, sizeof(msgbuf), 2, 0);
+    printf("W: [message sent] %s\n", msg.mtext);
+
+    // remove message queue
+    if (msgctl(msgid, IPC_RMID, 0) == -1)
+    {
+        fprintf(stderr, "Remove message queue error: %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    exit(EXIT_SUCCESS);
+}
+
+int main()
+{
+    init();
+
+    pthread_create(&write_pid, NULL, writeProcess, NULL);
+    pthread_create(&read_pid, NULL, readProcess, NULL);
+    // waiting for the thread end
+    pthread_join(write_pid, NULL);
+    pthread_join(read_pid, NULL);
+
+    printf("Main end...");
 }
