@@ -46,13 +46,13 @@ struct msgbuf msg;
 void init()
 {
     // init semaphore
-    sem_init(&full, 0, 0);
-    sem_init(&empty,0 ,1);
-    sem_init(&mutex, 0, 1);
+    sem_init(&full, 0, 0);      // 工作
+    sem_init(&empty,0 ,1);      // 空闲
+    sem_init(&mutex, 0, 1);     // 空闲
 
     key = KEY_NUM;
 
-    // create message queue
+    // create message queue: key
     if((msgid = msgget(key, PERM|IPC_CREAT)) == -1)
     {
         fprintf(stderr, "Create Message Queue Error %s \n", strerror(errno));
