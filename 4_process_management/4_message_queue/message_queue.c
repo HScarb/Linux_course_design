@@ -15,7 +15,7 @@
 #define TRUE 1
 
 #define BUFFER_SIZE 255
-#define RERM S_IRUSR|S_IWUSR
+#define PERM S_IRUSR|S_IWUSR
 #define KEY_NUM 1000
 
 typedef struct msgbuf msgbuf;
@@ -24,7 +24,7 @@ struct msgbuf
 {
     long mtype;
     char mtext[BUFFER_SIZE+ 1 ];
-}
+};
 
 // semaphore and mutex
 sem_t full;
