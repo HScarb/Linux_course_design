@@ -5,7 +5,7 @@
 key_t key;
 
 // shared memory 
-int dhmid;
+int shmid;
 char *shmptr;
 char input[SHM_SIZE];
 

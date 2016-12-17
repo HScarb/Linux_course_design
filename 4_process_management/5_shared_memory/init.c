@@ -1,5 +1,5 @@
 // init.c
-#include "common.h"
+#include "global.h"
 
 int main(int argc, const char * argv[])
 {
