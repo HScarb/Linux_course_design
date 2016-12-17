@@ -24,6 +24,7 @@ static const char * FULL_NAME = "full_shm";
 #define SHM_SIZE 1024
 #define KEY_NUM 1000
 
+// get shared memory id
 int getShmId(key_t key);
 
 /*
