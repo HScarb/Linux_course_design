@@ -21,6 +21,28 @@ make
 cmd1
 cmd2
 cmd3
+exit
 ```
 
 ## 5. 输出
+```
+# ./myshell 
+
+*Please Input your command:
+cmd1
+Process 1 is running.
+*Wating for next command...
+
+*Please Input your command:
+cmd2
+Process 2 is running.
+*Wating for next command...
+
+*Please Input your command:
+cmd3
+Process 3 is running.
+*Wating for next command...
+
+*Please Input your command:
+exit
+```
