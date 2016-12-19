@@ -61,12 +61,22 @@ void writeProcess(int  fd[2], int len)
 {
 	pipeWrite(fd,len);
 
-	printf("Write process: Sleep - 5 Seconds ...\n");
-	sleep(5);
-	printf("Write process: Wake up, rewrite 70 characters.\n");
+//	printf("Write process: Sleep - 5 Seconds ...\n");
+//	sleep(5);
+//	printf("Write process: Wake up, rewrite 70 characters.\n");
 
-	pipeWrite(fd,len);
+//	pipeWrite(fd,len);
 	printf("Write process: Done\n");
+}
+
+void readProcess(int fd[2], int len)
+{
+	printf("Read process: Time 1\n");
+	pipeRead(fd, len);
+//	printf("Read process: Time 2\n");
+//	pipeRead(fd, 20);
+//	printf("Read process: Time 3\n");
+//	pipeRead(fd, 30);
 }
 
 int main()
@@ -81,8 +91,8 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    for (i = 0; i < 3; i ++)
-    {
+//    for (i = 0; i < 3; i ++)
+  //  {
         if((pid = fork()) < 0)
         {
             fprintf(stderr, "Fork error: %s\n", strerror(errno));
@@ -90,15 +100,27 @@ int main()
         }
         if (pid == 0)
         {
-            writeProcess(fd, i * 20);
+            writeProcess(fd, 10);
         }
         else
         {
-            wait(NULL);
-            wait(NULL);
-            wait(NULL);
-            printf("Wait 3 child.");
-            readProcess(fd);
+            pid = fork();
+	    if (pid == 0)
+		writeProcess(fd, 20);
+	    else
+	    {
+		// pipeRead(fd, 30);
+		pid = fork();
+		if (pid == 0)
+			writeProcess(fd, 30);
+		else
+		{
+			wait(NULL);
+			wait(NULL);
+			wait(NULL);
+			pipeRead(fd, 60);
+		}
+	    }
         }
-    }
+    //}
 }

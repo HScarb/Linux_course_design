@@ -30,6 +30,7 @@ int isEnd = 0;
 sem_t full;
 sem_t empty;
 sem_t mutex;
+sem_t end;
 
 // pthread
 pthread_t write_pid;
@@ -49,6 +50,7 @@ void init()
     sem_init(&full, 0, 0);      // 工作
     sem_init(&empty,0 ,1);      // 空闲
     sem_init(&mutex, 0, 1);     // 空闲
+    sem_init(&end, 0, 0);
 
     key = KEY_NUM;
 
@@ -83,6 +85,7 @@ void * readProcess(void *arg)
 	    printf("R: [message sent] over\n");
             sem_post(&empty);
 	    sem_post(&mutex);
+	    sem_post(&end);
 	    break;
         }
 
@@ -129,27 +132,24 @@ void * writeProcess(void * arg)
         sem_post(&full);
         sem_post(&mutex);
     }
-    printf("W: enter");
-        while(isEnd){
-        printf("W: Enter.");
-        sem_wait(&empty);
-        sem_wait(&mutex);
-        printf("W: Wait to receive \"over\"\n");
-        // clear node
-        memset(&msg, '\0', sizeof(msgbuf));
-        // block, waiting for message with type 2
-        msgrcv(msgid, &msg, sizeof(msgbuf), 2, 0);
-        printf("W: [message received2] %s\n", msg.mtext);
-        sem_post(&empty);
-        sem_post(&mutex);
-        break;
-}
+
+    // clear node
+    memset(&msg, '\0', sizeof(msgbuf));
+    // Block, waiting for msg with type = 2
+    msgrcv(msgid, &msg, sizeof(msgbuf), 2, 0);
+    printf("W: [message receive] %s\n", msg.mtext);
+
+    // semaphore
+    sem_post(&full);
+    sem_post(&mutex);
+
     // remove message queue
     if (msgctl(msgid, IPC_RMID, 0) == -1)
     {
         fprintf(stderr, "Remove message queue error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
+    printf("W: Exit.\n");
     exit(EXIT_SUCCESS);
 }
 

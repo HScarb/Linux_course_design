@@ -1,8 +1,8 @@
 # Makefile
-pipe_communication: pipe_communication.o
+pipe: pipe.o
 
 .PHONY: clean
 
 clean:
 	rm *.o
-	rm pipe_communication
+	rm pipe
