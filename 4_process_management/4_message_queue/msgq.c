@@ -46,8 +46,7 @@ struct msgbuf msg;
 void init()
 {
     // init semaphore
-    sem_init(&full, 0, 0);      // 工作
-    sem_init(&empty,0 ,1);      // 空闲
+    sem_init(&end, 0, 0);      // 工作
     sem_init(&mutex, 0, 1);     // 空闲
 
     key = KEY_NUM;
@@ -67,7 +66,6 @@ void * readProcess(void *arg)
     msg.mtype = 1;
     while(1)
     {
-        sem_wait(&full);
         sem_wait(&mutex);
 
         // receive message from message queue
@@ -89,7 +87,6 @@ void * readProcess(void *arg)
         // print message
         printf("R: [message received] %s\n\n", msg.mtext);
 
-        sem_post(&empty);
         sem_post(&mutex);
     }
     printf("R: Exit.\n");
@@ -105,7 +102,6 @@ void * writeProcess(void * arg)
     while(!isEnd)
     {
         // semaphore
-        sem_wait(&empty);
         sem_wait(&mutex);
 
         printf("W: Please input the message you want to send:\n");
@@ -126,23 +122,20 @@ void * writeProcess(void * arg)
 
         printf("W: [message sent] %s\n", msg.mtext);
 
-        sem_post(&full);
         sem_post(&mutex);
     }
-    printf("W: enter");
-        while(isEnd){
-        printf("W: Enter.");
-        sem_wait(&empty);
-        sem_wait(&mutex);
-        printf("W: Wait to receive \"over\"\n");
-        // clear node
-        memset(&msg, '\0', sizeof(msgbuf));
-        // block, waiting for message with type 2
-        msgrcv(msgid, &msg, sizeof(msgbuf), 2, 0);
-        printf("W: [message received2] %s\n", msg.mtext);
-        sem_post(&empty);
-        sem_post(&mutex);
-        break;
+    printf("W: Enter.");
+    while(isEnd){
+    sem_wait(&mutex);
+    printf("W: Wait to receive \"over\"\n");
+    // clear node
+    memset(&msg, '\0', sizeof(msgbuf));
+    // block, waiting for message with type 2
+    msgrcv(msgid, &msg, sizeof(msgbuf), 2, 0);
+    printf("W: [message received2] %s\n", msg.mtext);
+    sem_post(&empty);
+    sem_post(&mutex);
+    break;
 }
     // remove message queue
     if (msgctl(msgid, IPC_RMID, 0) == -1)
