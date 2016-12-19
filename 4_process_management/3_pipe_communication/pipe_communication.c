@@ -20,14 +20,9 @@ void initStr(char * str, int len)
     {
         strcat(string, "*");
     }
-    /*
-    printf("string = %s\n", string);
-
     strcpy(str, "\0");
-    printf("str = %s\n", str);
     strcat(str, string);
-    printf("str now = %s\n", str);
-    */
+//    printf("str = %s\n", str);
 }
 
 void pipeWrite(int fd[2], int len)
@@ -65,12 +60,11 @@ void pipeRead(int fd[2], int len)
 
 void writeProcess(int  fd[2])
 {
-
 	pipeWrite(fd,WRITE_LEN);
 
-	printf("Write process: Sleep - 10 Seconds ...\n");
-	sleep(10);
-	printf("Write process: Wake up, then Why not rewrite 70 characters ? \n");
+	printf("Write process: Sleep - 5 Seconds ...\n");
+	sleep(5);
+	printf("Write process: Wake up, rewrite 70 characters.\n");
 
 	pipeWrite(fd,WRITE_LEN);
 	printf("Write process: Done\n");
@@ -78,13 +72,13 @@ void writeProcess(int  fd[2])
 
 void readProcess(int fd[2])
 {
-    printf("Read process: Time 1.====================\n");
+    printf("Read process: Time 1====================\n");
     pipeRead(fd, READ_LEN);
 
-    printf("Read process: Time 2.====================\n");
+    printf("Read process: Time 2====================\n");
     pipeRead(fd, READ_LEN);
 
-    printf("Read process: Time 3.====================\n");\
+    printf("Read process: Time 3====================\n");\
     pipeRead(fd, READ_LEN);
 }
 
@@ -93,23 +87,23 @@ int main()
     int fd[2];
     pid_t pid;
 
-    if(pipe(fd) < 0)        // check pipe
+    if(pipe(fd) < 0)        	// create pipe
     {
         fprintf(stderr, "Create pipe error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    if((pid = fork()) < 0)      // check fork
+    if((pid = fork()) < 0)      // create fork
     {
         fprintf(stderr, "Fork error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    if (pid == 0)           // child interprocess 1 ==? write
+    if (pid == 0)           	// child interprocess 1 : write
     {
         writeProcess(fd);
     }
-    else                    // father interprocess
+    else                    	// father interprocess
     {
         // create a new child interprocess: read 50
         if((pid = fork()) < 0)
@@ -123,8 +117,8 @@ int main()
         }
         else                // father interprocess
         {
-            wait(0);
-            wait(0);
+            wait(NULL);
+            wait(NULL);
             printf("End of program.\n");
             return 0;
         }

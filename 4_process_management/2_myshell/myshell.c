@@ -68,15 +68,18 @@ void myFork(int cmdIndex)
 
 		if (execl_status < 0)
 		{
-			printf("*Fork error.\n");
+			printf("*Execl error.\n");
 			exit(1);
 		}
 
-		printf("-Child is OK!\n");
+		printf("-Child is Finish!\n");
 		exit(0);
 	}
 	else
-		return;
+	{	
+		printf("-Father is wating for son.\n");
+		wait(NULL);
+	}
 }
 
 /**
