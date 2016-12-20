@@ -74,27 +74,28 @@ void * readProcess(void *arg)
 
         // receive message from message queue
         msgrcv(msgid, &msg, sizeof(msgbuf), 1, 0);
+	
+	printf("R: [message received] %s\n\n", msg.mtext);
+	sem_post(&mutex);
+	sem_post(&empty);
 
         // detect for end
         if(strcmp(msg.mtext, "end") == 0)
         {
-	    printf("R: [message received] end\n");
             msg.mtype = 2;
             strncpy(msg.mtext, "over", BUFFER_SIZE);
+	    
+	    sem_wait(&empty);
+	    sem_wait(&mutex);
             msgsnd(msgid, &msg, sizeof(msgbuf), 0);
 	    printf("R: [message sent] over\n");
-            sem_post(&empty);
 	    sem_post(&mutex);
+            sem_post(&full);
 	    sem_post(&end);
 	    break;
         }
-
-        // print message
-        printf("R: [message received] %s\n\n", msg.mtext);
-
-        sem_post(&empty);
-        sem_post(&mutex);
     }
+    sleep(1);
     printf("R: Exit.\n");
     exit(EXIT_SUCCESS);
 }
@@ -119,18 +120,30 @@ void * writeProcess(void * arg)
             strncpy(msg.mtext, "end", BUFFER_SIZE);
             msgsnd(msgid, &msg, sizeof(msgbuf), 0);
 	    printf("W: [message sent] end\n");
-	    isEnd = 1;
-	    sem_post(&full);
-	    sem_post(&mutex);
-            break;
+//	    isEnd = 1;
         }
-        strncpy(msg.mtext, input, BUFFER_SIZE);
-        msgsnd(msgid, &msg, sizeof(msgbuf), 0);
+	else
+	{
+            strncpy(msg.mtext, input, BUFFER_SIZE);
+            msgsnd(msgid, &msg, sizeof(msgbuf), 0);
 
-        printf("W: [message sent] %s\n", msg.mtext);
+            printf("W: [message sent] %s\n", msg.mtext);
 
-        sem_post(&full);
-        sem_post(&mutex);
+	}
+	sem_post(&mutex);
+	sem_post(&full);
+ 
+	// receive over
+	if(strcmp(msg.mtext, "end") == 0)
+	{
+		sem_wait(&end);
+		// clear node
+		memset(&msg, '\0', sizeof(msgbuf));
+		// waiting for msg with type 2
+		msgrcv(msgid, &msg, sizeof(msgbuf), 2, 0);
+		printf("W: [message receive] %s\n", msg.mtext);
+		printf("W: Exit.\n");
+	}
     }
 
     // clear node
@@ -157,8 +170,8 @@ int main()
 {
     init();
 
-    pthread_create(&write_pid, NULL, writeProcess, NULL);
     pthread_create(&read_pid, NULL, readProcess, NULL);
+    pthread_create(&write_pid, NULL, writeProcess, NULL);
     // waiting for the thread end
     pthread_join(write_pid, NULL);
     pthread_join(read_pid, NULL);
