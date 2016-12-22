@@ -111,9 +111,11 @@ int find_father_dir(int fd);        // 寻找一个打开文件的父目录打�
 ⑦ 使用c语言的库函数fclose()关闭myfsys文件；
 ⑧ 初始化用户打开文件表，将表项0分配给根目录文件使用，并填写根目录文件的相关信息，由于根目录没有上级目录，所以表项中的dirno和diroff分别置为5（根目录所在起始块号）和0；并将ptrcurdir指针指向该用户打开文件表项。
 ⑨ 将当前目录设置为根目录。
-
  */
 void startSys()
 {
-
+    /**
+     * 1. 寻找
+    myvhard = (unsigned char *)malloc(SIZE);
+    
 }
