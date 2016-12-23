@@ -13,6 +13,8 @@
 #define MAXOPENFILE         10      // 最多同时打开的文件个数
 
 #define MAX_TEXT_SIZE       10000
+#define FILENAME_SIZE		8		// 文件名长度
+#define EXNAME_SIZE			4		// 文件扩展名长度
 
 /* define data structures */
 /**
@@ -20,8 +22,8 @@
 用于记录文件的描述和控制信息，每个文件设置一个FCB，它也是文件的目录项的内容。
 */
 typedef struct FCB {
-	char filename[8];               // 文件名
-	char exname[4];                 // 文件扩展名
+	char filename[FILENAME_SIZE];   // 文件名
+	char exname[EXNAME_SIZE];		// 文件扩展名
 	unsigned char attribute;        // 文件属性字段，值为0时表示目录文件，值为1时表示数据文件
 	unsigned short time;            // 文件创建时间
 	unsigned short date;            // 文件创建日期
@@ -55,8 +57,8 @@ typedef struct FAT {
 用来记录每个打开文件所在的目录名，以方便用户打开不同目录下具有相同文件名的不同文件。
  */
 typedef struct USEROPEN {
-	char filename[8];               // 文件名
-	char exname[4];                 // 文件扩展名
+	char filename[FILENAME_SIZE];	// 文件名
+	char exname[EXNAME_SIZE];		// 文件扩展名
 	unsigned char attribute;        // 文件属性字段，值为0时表示目录文件，值为1时表示数据文件
 	unsigned short time;            // 文件创建时间
 	unsigned short date;            // 文件创建日期
@@ -455,7 +457,7 @@ int do_read(int fd, int len, char* text)
 			fatptr = fat1 + blkno;						// 实际地址
 		}
 	}
-	text[11] = '\0';
+	text[ll] = '\0';
 	free(buf);
 
 	return ll;
@@ -607,7 +609,7 @@ int my_read(int fd, int len)
 	openfilelist[fd].count = 0;
 	ll = do_read(fd, len, text);
 	if (ll != -1)
-		printf("%s", text);
+		printf("%s\n", text);
 	else
 		printf("[Error]my_read: Read error!\n");
 	return ll;
@@ -1049,7 +1051,7 @@ my_open | 打开文件函数
 int my_open(char* filename)
 {
 	fcb *fcbptr;
-	char *fname, exname[3], *str, text[MAX_TEXT_SIZE];
+	char *fname, exname[EXNAME_SIZE], *str, text[MAX_TEXT_SIZE];
 	int readByteNum, fd, i;
 
 	fname = strtok(filename, ".");					// 分出文件名
@@ -1197,7 +1199,7 @@ int my_write(int fd)
 	while(1)
 	{
 		//1.截断写 2.覆盖写 3.追加写
-		printf("Enter write style:\n 1. Cut write\t2. Cover write\t3. Add write");
+		printf("Enter write style:\n1. Cut write\t2. Cover write\t3. Add write\n");
 		scanf("%d", &wstyle);
 		if (wstyle > 0 && wstyle < 4)
 			break;
@@ -1236,7 +1238,7 @@ int my_write(int fd)
 		break;
 	}
 	ll = 0;
-	printf("Input data (end with ctrl+z):\n");
+	printf("Input data (end with Ctrl+Z):\n");
 	while (gets_s(text))
 	{
 		len = strlen(text);
@@ -1348,19 +1350,19 @@ int main()
 					printf("请输入正确的指令.\n");
 				break;
 			case 7:
-				if (!(openfilelist[curdir].attribute == 1))
+				if (!(openfilelist[curdir].attribute == 0))
 					curdir = my_close(curdir);
 				else
 					printf("文件打开失败.\n");
 				break;
 			case 8:
-				if (!(openfilelist[curdir].attribute == 1))
+				if (!(openfilelist[curdir].attribute == 0))
 					my_write(curdir);
 				else
 					printf("文件打开失败.\n");
 				break;
 			case 9:
-				if (!(openfilelist[curdir].attribute == 1))
+				if (!(openfilelist[curdir].attribute == 0))
 					my_read(curdir, openfilelist[curdir].length);
 				else
 					printf("文件打开失败.\n");
