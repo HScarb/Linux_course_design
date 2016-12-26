@@ -21,7 +21,6 @@ void initStr(char * str, int len)
     }
     strcpy(str, "\0");
     strcat(str, string);
-//    printf("str = %s\n", str);
 }
 
 void pipeWrite(int fd[2], int len)
@@ -55,17 +54,13 @@ void pipeRead(int fd[2], int len)
     close(fd[1]);
     nRead = read(fd[0], buffer, len);
     printf("Read process: Read %d characters.\n", nRead);
+    printf("Read: %s\n", buffer);
 }
 
 void writeProcess(int  fd[2], int len)
 {
 	pipeWrite(fd,len);
 
-//	printf("Write process: Sleep - 5 Seconds ...\n");
-//	sleep(5);
-//	printf("Write process: Wake up, rewrite 70 characters.\n");
-
-//	pipeWrite(fd,len);
 	printf("Write process: Done\n");
 }
 
@@ -73,10 +68,6 @@ void readProcess(int fd[2], int len)
 {
 	printf("Read process: Time 1\n");
 	pipeRead(fd, len);
-//	printf("Read process: Time 2\n");
-//	pipeRead(fd, 20);
-//	printf("Read process: Time 3\n");
-//	pipeRead(fd, 30);
 }
 
 int main()
@@ -91,8 +82,6 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-//    for (i = 0; i < 3; i ++)
-  //  {
         if((pid = fork()) < 0)
         {
             fprintf(stderr, "Fork error: %s\n", strerror(errno));
@@ -109,7 +98,6 @@ int main()
 		writeProcess(fd, 20);
 	    else
 	    {
-		// pipeRead(fd, 30);
 		pid = fork();
 		if (pid == 0)
 			writeProcess(fd, 30);
@@ -118,9 +106,9 @@ int main()
 			wait(NULL);
 			wait(NULL);
 			wait(NULL);
-			pipeRead(fd, 60);
+			pipeRead(fd, 40);
+			pipeRead(fd, 30);
 		}
 	    }
         }
-    //}
 }
