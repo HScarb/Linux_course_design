@@ -1106,7 +1106,7 @@ int my_open(char* filename)
 	//文件目录名; 
 	strcpy(openfilelist[fd].dir, openfilelist[curdir].dir);
 	strcat(openfilelist[fd].dir, filename);
-	if (fcbptr->attribute & 0x20)
+	if (fcbptr->attribute == 0)
 		strcat(openfilelist[fd].dir, "\\");
 	openfilelist[fd].father = curdir;
 	openfilelist[fd].count = 0;
@@ -1120,6 +1120,8 @@ my_close | 关闭文件函数
 功能:关闭前面由my_open()打开的文件描述符为fd的文件。
 输入:
 	fd:文件描述符。
+输出:
+	father:父目录的文件描述符
 
 	① 检查fd的有效性（fd不能超出用户打开文件表所在数组的最大下标），如果无效则返回-1；
 	② 检查用户打开文件表表项中的fcbstate字段的值，如果为1则需要将该文件的FCB的内容保存到虚拟磁盘上该文件的目录项中，方法是：打开该文件的父目录文件，以覆盖写方式调用do_write()将欲关闭文件的FCB写入父目录文件的相应盘块中；
